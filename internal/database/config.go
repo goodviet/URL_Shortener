@@ -3,8 +3,10 @@ package database
 import (
     "context"
     "log"
+	"os"
     "time"
 
+    "github.com/joho/godotenv"
     "go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -12,14 +14,24 @@ import (
 var Client *mongo.Client
 
 func ConnectMongo() {
+
+	   // Load .env
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+	mongoURI := os.Getenv("MONGO_URI")
+    if mongoURI == "" {
+        log.Fatal("MONGO_URI is not set")
+    }
+
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
     client, err := mongo.Connect(
         ctx,
-        options.Client().ApplyURI(
-            "mongodb+srv://phanminh:phanminhdat11@cluster0.jxjisrt.mongodb.net/service_shortener_url?retryWrites=true&w=majority",
-        ),
+        options.Client().ApplyURI(mongoURI),
     )
     if err != nil {
         log.Fatal("Mongo connect error:", err)

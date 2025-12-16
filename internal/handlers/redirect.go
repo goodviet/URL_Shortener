@@ -1,28 +1,29 @@
 package handlers
 
 import (
-    "net/http"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
-    "url-shortener/internal/services"
+	"github.com/gin-gonic/gin"
+	"url-shortener/internal/services"
 )
 
 type RedirectHandler struct {
-    service *services.URLService
+	service *services.URLService
 }
 
 func NewRedirectHandler(s *services.URLService) *RedirectHandler {
-    return &RedirectHandler{service: s}
+	return &RedirectHandler{service: s}
 }
 
 func (h *RedirectHandler) Redirect(c *gin.Context) {
-    code := c.Param("code")
+	code := c.Param("code")
 
-    url, err := h.service.FindByShortURL(code)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
-        return
-    }
+	url, err := h.service.FindAndIncreaseClick(c.Request.Context(), code)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "URL not found"})
+		return
+	}
 
-    c.Redirect(http.StatusFound, url.OriginalURL)
+	// Redirect 302
+	c.Redirect(http.StatusFound, url.OriginalURL)
 }

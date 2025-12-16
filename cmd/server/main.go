@@ -18,12 +18,8 @@ func main() {
     shortHandler := handlers.NewShortURLHandler(urlService)
     redirectHandler := handlers.NewRedirectHandler(urlService)
 
-	// test short url 
     r.POST("/api/shorten", shortHandler.Create)
-
-	// get new url
     r.GET("/:code", redirectHandler.Redirect)
 
-	// PORT
     r.Run(":8080")
 }
