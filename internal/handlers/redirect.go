@@ -16,9 +16,9 @@ func NewRedirectHandler(s *services.URLService) *RedirectHandler {
 }
 
 func (h *RedirectHandler) Redirect(c *gin.Context) {
-	code := c.Param("code")
+	codeURL := c.Param("codeURL")
 
-	url, err := h.service.FindAndIncreaseClick(c.Request.Context(), code)
+	url, err := h.service.FindAndIncreaseClick(c.Request.Context(), codeURL)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "URL not found"})
 		return

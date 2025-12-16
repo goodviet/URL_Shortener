@@ -17,9 +17,14 @@ func main() {
 
     shortHandler := handlers.NewShortURLHandler(urlService)
     redirectHandler := handlers.NewRedirectHandler(urlService)
+	infoHandler := handlers.NewURLInfoHandler(urlService)
+	// get list url tao tu url original
+	listHandler := handlers.NewListURLHandler(urlService)
 
     r.POST("/api/shorten", shortHandler.Create)
-    r.GET("/:code", redirectHandler.Redirect)
+    r.GET("/:codeURL", redirectHandler.Redirect)
+	r.GET("/api/links/:codeURL", infoHandler.GetInfo)
+	r.GET("/api/links", listHandler.List)
 
     r.Run(":8080")
 }

@@ -69,9 +69,47 @@ func (s *URLService) FindAndIncreaseClick(ctx context.Context, shortURL string) 
 // Check trùng short code
 func (s *URLService) checkShortURLExists(ctx context.Context, shortURL string) (bool, error) {
 	count, err := database.URLCollection().
-		CountDocuments(ctx, bson.M{"short_url": shortURL})
+		CountDocuments(ctx, bson.M{"shortURL": shortURL})
 	if err != nil {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// get info url
+
+func (s *URLService) GetInfo(codeURL string) (*models.URL, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var url models.URL
+	err := database.URLCollection().
+		FindOne(ctx, bson.M{"shortURL": codeURL}).
+		Decode(&url)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &url, nil
+}
+
+
+// 
+func (s *URLService) ListAll() ([]models.URL, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := database.URLCollection().Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var urls []models.URL
+	if err := cursor.All(ctx, &urls); err != nil {
+		return nil, err
+	}
+
+	return urls, nil
 }
