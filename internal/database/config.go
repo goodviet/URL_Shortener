@@ -26,6 +26,7 @@ func ConnectMongo() {
         log.Fatal("MONGO_URI is not set")
     }
 
+
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
@@ -33,6 +34,8 @@ func ConnectMongo() {
         ctx,
         options.Client().ApplyURI(mongoURI),
     )
+	
+
     if err != nil {
         log.Fatal("Mongo connect error:", err)
     }
